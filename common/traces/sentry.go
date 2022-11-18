@@ -139,6 +139,7 @@ type TCapturedEvent struct {
 
 func Capture(level string, msg string, tags ...TTags) *TCapturedEvent {
 	event := sentry.NewEvent()
+	event.Fingerprint = append(event.Fingerprint, msg)
 	event.Level = captureLevel[level]
 	event.Message = msg
 	if len(tags) > 0 {

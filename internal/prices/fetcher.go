@@ -94,9 +94,10 @@ func fetchPrices(chainID uint64, tokenList []common.Address) map[common.Address]
 	for _, token := range tokenList {
 		if newPriceMap[token] == nil || newPriceMap[token].IsZero() {
 			traces.
-				Capture(`error`, `missing a valid price for token `+token.String()).
+				Capture(`warn`, `missing a valid price for token `+token.Hex()).
 				SetEntity(`prices`).
 				SetTag(`chainID`, strconv.FormatUint(chainID, 10)).
+				SetTag(`tokenAddress`, token.Hex()).
 				Send()
 		}
 	}
