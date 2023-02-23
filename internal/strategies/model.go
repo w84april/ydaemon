@@ -224,17 +224,17 @@ func FindStrategy(chainID uint64, strategyAddress ethcommon.Address) (*TStrategy
 }
 
 /**********************************************************************************************
-** SlipStrategiesAddedPerVault will transform a list of TStrategyAdded into a map of
+** SplitStrategiesAddedPerVault will transform a list of TStrategyAdded into a map of
 ** TStrategyAdded per vault address:
 ** - [vaultAddress] - [strategyAddress] - TStrategyAdded
 **********************************************************************************************/
-func SlipStrategiesAddedPerVault(strategiesAddedList []TStrategyAdded) map[ethcommon.Address]map[ethcommon.Address]TStrategyAdded {
-	strategiesAddedPerVault := make(map[ethcommon.Address]map[ethcommon.Address]TStrategyAdded)
+func SplitStrategiesAddedPerVault(strategiesAddedList []*TStrategy) map[ethcommon.Address]map[ethcommon.Address]*TStrategy {
+	strategiesAddedPerVault := make(map[ethcommon.Address]map[ethcommon.Address]*TStrategy)
 	for _, strategy := range strategiesAddedList {
 		if _, ok := strategiesAddedPerVault[strategy.VaultAddress]; !ok {
-			strategiesAddedPerVault[strategy.VaultAddress] = make(map[ethcommon.Address]TStrategyAdded)
+			strategiesAddedPerVault[strategy.VaultAddress] = make(map[ethcommon.Address]*TStrategy)
 		}
-		strategiesAddedPerVault[strategy.VaultAddress][strategy.StrategyAddress] = strategy
+		strategiesAddedPerVault[strategy.VaultAddress][strategy.Address] = strategy
 	}
 	return strategiesAddedPerVault
 }
