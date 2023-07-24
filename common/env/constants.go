@@ -51,7 +51,7 @@ var MAX_BLOCK_RANGE = map[uint64]uint64{
 
 // MAX_BATCH_SIZE is the maximum size request for a multicall
 var MAX_BATCH_SIZE = map[uint64]int{
-	1:     math.MaxInt64,
+	1:     1_000, //Tenderly very up limit
 	10:    1_000,
 	250:   math.MaxInt64,
 	42161: math.MaxInt64,

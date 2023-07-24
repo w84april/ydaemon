@@ -22,7 +22,7 @@ func main() {
 	switch process {
 	case ProcessServer:
 		logs.Info(`Running yDaemon server process...`)
-		go NewRouter().Run(`:8080`)
+		go NewRouter().Run(`:8081`)
 
 		for _, chainID := range chains {
 			setStatusForChainID(chainID, "Loading")
@@ -34,7 +34,7 @@ func main() {
 			setStatusForChainID(chainID, "OK")
 		}
 
-		logs.Success(`Server ready on port 8080 !`)
+		logs.Success(`Server ready on port 8081 !`)
 		select {}
 
 	case ProcessPartnerFees:

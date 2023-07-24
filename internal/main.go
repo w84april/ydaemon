@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/go-co-op/gocron"
+	"github.com/yearn/ydaemon/common/logs"
 	"github.com/yearn/ydaemon/internal/events"
 	"github.com/yearn/ydaemon/internal/indexer"
 	bribes "github.com/yearn/ydaemon/internal/indexer.bribes"
@@ -68,12 +69,14 @@ func runRetrieveAllStrategies(chainID uint64, strategiesAddedList []models.TStra
 
 func InitializeV2(chainID uint64, wg *sync.WaitGroup) {
 	defer wg.Done()
+	now := time.Now()
+	logs.Info(`STARTING INITIALIZE V2`, chainID, now)
 	go InitializeBribes(chainID)
 
 	vaultsMap := registries.RegisterAllVaults(chainID, 0, nil)
 	tokens.RetrieveAllTokens(chainID, vaultsMap)
 
-	cron.Every(15).Minute().Do(func() {
+	cron.Every(30).Minute().Do(func() {
 		prices.RetrieveAllPrices(chainID)
 		vaults.RetrieveAllVaults(chainID, vaultsMap)
 		strategiesAddedList := events.HandleStrategyAdded(chainID, vaultsMap, 0, nil)
@@ -83,6 +86,7 @@ func InitializeV2(chainID uint64, wg *sync.WaitGroup) {
 			initDailyBlock.Run(chainID)
 			apy.ComputeChainAPR(chainID)
 		}()
+		logs.Success(`INITIALIZATION COMPLETE`, chainID, time.Since(now))
 	})
 
 	cron.Every(10).Minute().Do(func() {
@@ -94,6 +98,8 @@ func InitializeV2(chainID uint64, wg *sync.WaitGroup) {
 	})
 	cron.StartAsync()
 	go registries.IndexNewVaults(chainID)
+	logs.Success(`ALL COMPLETE`, chainID, time.Since(now))
+
 }
 
 func InitializeBribes(chainID uint64) {
