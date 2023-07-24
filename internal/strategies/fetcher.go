@@ -3,11 +3,13 @@ package strategies
 import (
 	"math/big"
 	"strconv"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/yearn/ydaemon/common/bigNumber"
 	"github.com/yearn/ydaemon/common/ethereum"
 	"github.com/yearn/ydaemon/common/helpers"
+	"github.com/yearn/ydaemon/common/logs"
 	"github.com/yearn/ydaemon/common/traces"
 	"github.com/yearn/ydaemon/internal/meta"
 	"github.com/yearn/ydaemon/internal/models"
@@ -60,7 +62,10 @@ func fetchBasicInformations(
 	** Then we can proceed the responses. Some date will already be available from the list of
 	** tokens, so we can already play with that.
 	**********************************************************************************************/
+	now := time.Now()
+	logs.Info(`[`, now.Format(`02/01/2006 15:04:05`), `] Fetching strategies data for`, len(strategyAddedList), `strategies ...`)
 	response := multicalls.Perform(chainID, calls, nil)
+	logs.Info(`[`, time.Since(now), `] Fetched strategies data for`, len(strategyAddedList), `strategies`)
 	for _, strat := range strategyAddedList {
 		vaultAddress := strat.VaultAddress
 		stratAddress := strat.StrategyAddress

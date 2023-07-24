@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/big"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/yearn/ydaemon/common/contracts"
@@ -110,6 +114,8 @@ func (caller *TEthMultiCaller) execute(
 	}
 
 	// Perform multicall
+	now := time.Now()
+	logs.Info(`Starting multicall execution for`, len(multiCallGroup), `calls`)
 	resp, err := caller.Client.CallContract(
 		context.Background(),
 		ethereum.CallMsg{
@@ -120,6 +126,19 @@ func (caller *TEthMultiCaller) execute(
 		},
 		blockNumber,
 	)
+	logs.Info(`Multicall execution took`, time.Since(now).String(), err)
+	// save callData to file
+	// get a unique filename
+	filename := "callData_" + strconv.FormatInt(time.Now().UnixNano(), 10) + ".txt"
+	callDataString := hexutil.Bytes(callData)
+	f, err := os.Create(filename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer f.Close()
+	f.WriteString(callDataString.String())
+	logs.Info(`Saved callData to file: ` + filename)
+
 	if err != nil {
 		chainID, _ := caller.Client.ChainID(context.Background())
 		return []byte{}, errors.New("Failed to perform multicall for:" + chainID.String() + " | " + err.Error())
@@ -159,7 +178,6 @@ func (caller *TEthMultiCaller) ExecuteByBatch(
 			rawCallsGroup = rawCalls[i : i+batchSize]
 		}
 		_ = rawCallsGroup
-
 		tempPackedResp, err := caller.execute(group, blockNumber)
 		if err != nil {
 			//print associated rawCalls

@@ -77,10 +77,22 @@ func InitializeV2(chainID uint64, wg *sync.WaitGroup) {
 	tokens.RetrieveAllTokens(chainID, vaultsMap)
 
 	cron.Every(30).Minute().Do(func() {
+		logs.Warning(`RUNNING RETRIEVE ALL PRICES`, chainID)
 		prices.RetrieveAllPrices(chainID)
+		logs.Success(`RETRIEVE ALL PRICES COMPLETE`, chainID)
+
+		logs.Warning(`RUNNING RETRIEVE ALL VAULTS`, chainID)
 		vaults.RetrieveAllVaults(chainID, vaultsMap)
+		logs.Success(`RETRIEVE ALL VAULTS COMPLETE`, chainID)
+
+		logs.Warning(`RUNNING HANDLE STRATEGY ADDED`, chainID)
 		strategiesAddedList := events.HandleStrategyAdded(chainID, vaultsMap, 0, nil)
+		logs.Success(`HANDLE STRATEGY ADDED COMPLETE`, chainID)
+
+		logs.Warning(`RUNNING RETRIEVE ALL STRATEGIES`, chainID)
 		strategies.RetrieveAllStrategies(chainID, strategiesAddedList)
+		logs.Success(`RETRIEVE ALL STRATEGIES COMPLETE`, chainID)
+
 		indexer.PostProcessStrategies(chainID)
 		go func() {
 			initDailyBlock.Run(chainID)
