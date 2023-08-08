@@ -16,6 +16,7 @@ type TStrategyAdded struct {
 	DebtLimit         *bigNumber.Int // == 0.2.2
 	RateLimit         *bigNumber.Int // == 0.2.2 - 0.3.0
 	VaultVersion      string
+	VaultType         TVaultType
 	ChainID           uint64
 	BlockNumber       uint64
 	TxIndex           uint
@@ -47,6 +48,7 @@ type TStrategy struct {
 	RewardsAddress          common.Address          `json:"rewardsAddress"`
 	HealthCheckAddress      common.Address          `json:"healthCheckAddress"`
 	VaultVersion            string                  `json:"vaultVersion"`
+	VaultType               TVaultType              `json:"vaultType"`
 	Name                    string                  `json:"name"`
 	DisplayName             string                  `json:"displayName"`
 	GroupName               string                  `json:"groupName"`

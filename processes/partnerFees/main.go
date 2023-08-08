@@ -281,10 +281,10 @@ func Run(chainID uint64, fromBlock uint64, toBlock *uint64) {
 ** Based on that, we have everything ready to compute the fees for each partner.
 **************************************************************************************************/
 func initYearnEcosystem(chainID uint64) {
-	vaultsMap := registries.RegisterAllVaults(chainID, 0, nil)
-	tokens.RetrieveAllTokens(chainID, vaultsMap)
+	vaultsMapFromRegistry := registries.RegisterAllVaults(chainID, 0, nil)
+	tokens.RetrieveAllTokens(chainID, vaultsMapFromRegistry)
 	prices.RetrieveAllPrices(chainID)
-	vaults.RetrieveAllVaults(chainID, vaultsMap)
+	vaultsMap := vaults.RetrieveAllVaults(chainID, vaultsMapFromRegistry)
 	strategiesAddedList := events.HandleStrategyAdded(chainID, vaultsMap, 0, nil)
 	strategies.RetrieveAllStrategies(chainID, strategiesAddedList)
 	indexer.PostProcessStrategies(chainID)

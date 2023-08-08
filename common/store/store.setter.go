@@ -309,6 +309,7 @@ func StoreStrategies(chainID uint64, strat models.TStrategyAdded) {
 			newItem.DebtLimit = strat.DebtLimit.String()
 			newItem.RateLimit = strat.RateLimit.String()
 			newItem.VaultVersion = strat.VaultVersion
+			newItem.VaultType = strat.VaultType
 			newItem.ChainID = strat.ChainID
 			newItem.BlockNumber = strat.BlockNumber
 			newItem.TxIndex = strat.TxIndex

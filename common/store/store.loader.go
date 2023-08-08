@@ -263,6 +263,7 @@ func LoadStrategies(chainID uint64, wg *sync.WaitGroup) {
 						DebtLimit:         bigNumber.NewInt(0).SetString(stratFromDB.DebtLimit),
 						RateLimit:         bigNumber.NewInt(0).SetString(stratFromDB.RateLimit),
 						VaultVersion:      stratFromDB.VaultVersion,
+						VaultType:         stratFromDB.VaultType,
 						ChainID:           stratFromDB.ChainID,
 						BlockNumber:       stratFromDB.BlockNumber,
 						TxIndex:           stratFromDB.TxIndex,

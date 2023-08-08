@@ -265,6 +265,10 @@ func computeRiskGroupAllocation(chainID uint64) {
 
 	strategies := ListStrategies(chainID)
 	for _, strategy := range strategies {
+		if strategy.VaultType == models.VaultTypeExperimental {
+			logs.Info(`Skipping strategy ` + strategy.Address.Hex() + ` (` + strategy.Name + `)` + ` because it is from an experimental vault ` + strategy.VaultAddress.Hex())
+			continue //Skip experimental vaults
+		}
 		strategyGroup := getStrategyGroup(chainID, strategy)
 		if strategyGroup == nil {
 			if !stratGroupErrorAlreadySent[chainID][strategy.Name] {

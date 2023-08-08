@@ -297,7 +297,6 @@ func RetrieveAllVaults(
 		}
 	}
 	vaultMap, _ = store.ListAllVaults(chainID)
-
 	_vaultMap[chainID] = vaultMap
 	return vaultMap
 }

@@ -33,7 +33,7 @@ import (
 ** Returns nothing as the asyncFeeMap is updated via a pointer
 **************************************************************************************************/
 func filterStrategyAdded(
-	vault models.TVaultsFromRegistry,
+	vault models.TVault,
 	vaultsLastBlockSync map[common.Address]uint64,
 	start uint64,
 	end *uint64,
@@ -80,7 +80,7 @@ func filterStrategyAdded(
 		}
 		opts := &bind.FilterOpts{Start: chunkStart, End: &chunkEnd}
 
-		switch vault.APIVersion {
+		switch vault.Version {
 		case `0.2.2`:
 			contract, _ := contracts.NewYvault022(vault.Address, client)
 			if log, err := contract.FilterStrategyAdded(opts, nil); err == nil {
@@ -176,7 +176,7 @@ func filterStrategyAdded(
 ** Returns nothing as the asyncFeeMap is updated via a pointer
 **************************************************************************************************/
 func filterStrategiesMigrated(
-	vault models.TVaultsFromRegistry,
+	vault models.TVault,
 	vaultsLastBlockSync map[common.Address]uint64,
 	start uint64,
 	end *uint64,
@@ -271,7 +271,7 @@ func filterStrategiesMigrated(
 **************************************************************************************************/
 func HandleStrategyAdded(
 	chainID uint64,
-	vaultsMap map[common.Address]models.TVaultsFromRegistry,
+	vaultsMap map[common.Address]models.TVault,
 	start uint64,
 	end *uint64,
 ) []models.TStrategyAdded {
@@ -296,7 +296,7 @@ func HandleStrategyAdded(
 	for _, v := range vaultsMap {
 		wg := &sync.WaitGroup{}
 		wg.Add(2)
-		go func(v models.TVaultsFromRegistry) {
+		go func(v models.TVault) {
 			defer wg.Done()
 			filterStrategyAdded(
 				v,
@@ -306,7 +306,7 @@ func HandleStrategyAdded(
 				asyncStrategiesForVaults,
 			)
 		}(v)
-		go func(v models.TVaultsFromRegistry) {
+		go func(v models.TVault) {
 			defer wg.Done()
 			filterStrategiesMigrated(
 				v,
@@ -348,7 +348,8 @@ func HandleStrategyAdded(
 			strategies[vaultAddressParsed] = make(map[common.Address]models.TStrategyAdded)
 		}
 		valueParsed := value.(models.TStrategyAdded)
-		valueParsed.VaultVersion = vaultsMap[vaultAddressParsed].APIVersion
+		valueParsed.VaultVersion = vaultsMap[vaultAddressParsed].Version
+		valueParsed.VaultType = vaultsMap[vaultAddressParsed].Type
 		strategies[vaultAddressParsed][strategyAddressParsed] = valueParsed
 		valueParsed.ChainID = chainID
 		allStrategiesList = append(allStrategiesList, valueParsed)
@@ -381,6 +382,8 @@ func HandleStrategyAdded(
 		oldStrategy := strategies[vaultAddressParsed][oldStrategyAddressParsed]
 		newStrategy := models.TStrategyAdded{
 			VaultAddress:      vaultAddressParsed,
+			VaultVersion:      vaultsMap[vaultAddressParsed].Version,
+			VaultType:         vaultsMap[vaultAddressParsed].Type,
 			StrategyAddress:   newStrategyAddressParsed,
 			TxHash:            value.(models.TStrategyMigrated).TxHash,
 			DebtRatio:         oldStrategy.DebtRatio,
@@ -394,7 +397,6 @@ func HandleStrategyAdded(
 			TxIndex:           value.(models.TStrategyMigrated).TxIndex,
 			LogIndex:          value.(models.TStrategyMigrated).LogIndex,
 		}
-		newStrategy.VaultVersion = vaultsMap[vaultAddressParsed].APIVersion
 		strategies[vaultAddressParsed][newStrategyAddressParsed] = newStrategy
 		allStrategiesList = append(allStrategiesList, newStrategy)
 		store.StoreStrategies(chainID, newStrategy)
@@ -403,6 +405,8 @@ func HandleStrategyAdded(
 	})
 
 	for _, strat := range allPreviouslyAddedStrategies {
+		strat.VaultType = vaultsMap[strat.VaultAddress].Type
+		strat.VaultVersion = vaultsMap[strat.VaultAddress].Version
 		allStrategiesList = append(allStrategiesList, strat)
 	}
 

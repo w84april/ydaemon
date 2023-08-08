@@ -100,6 +100,7 @@ func fetchBasicInformations(
 			VaultAddress:            strat.VaultAddress,
 			ChainID:                 chainID,
 			VaultVersion:            strat.VaultVersion,
+			VaultType:               strat.VaultType,
 			CreditAvailable:         bigNumber.NewInt(0),
 			DebtOutstanding:         bigNumber.NewInt(0),
 			ExpectedReturn:          bigNumber.NewInt(0),
